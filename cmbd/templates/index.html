@@ -1,0 +1,170 @@
+{% extends 'layout.html'%}
+
+{% block title %}
+用户列表
+<button class='btn btn-info' data-toggle="modal" data-target="#adduserModal" id='openmodal'>
+  注册用户
+</button>
+{% endblock %}
+
+{% block body %}
+<h1></h1>
+<table class='table table-bordered table-hover '>
+<thead>
+   <tr>
+     <th>id</th>
+     <th>用户名</th>
+     <th>密码</th>
+     <th>动作</th>
+   </tr>
+</thead>
+
+<tbody id='tbody-content'>
+
+</tbody>
+</table>
+{% endblock %}
+
+{% block mdbody %}
+<div class="modal fade" id="adduserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">注册用户</h4>
+      </div>
+      <div class="modal-body">
+         <form action='/adduser' id='addform'>
+          <div class="form-group">
+            <label for="recipient-name" class="control-label">用户名:</label>
+            <input type="text" class="form-control" id="userinput" name='user'>
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">密码:</label>
+            <input type="text" class="form-control" id="pwdinput" name='pwd'>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary">注册</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="updateuserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">更新密码</h4>
+      </div>
+      <div class="modal-body">
+         <form action='/updateuser' id='updateform'>
+          <div class="form-group">
+            <label for="message-text" class="control-label">密码:</label>
+            <input type="text" class="form-control" id="pwdinput" name='pwd'>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <input type="submit" class="btn btn-primary" value='更新'>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+  $('#adduserModal').find('.btn-primary').on('click',function(){
+    var url = '/adduser'
+    var user = $('#userinput').val()
+    var pwd = $('#pwdinput').val()
+    $.post(url,{user:user,pwd:pwd},function(res){
+        if (res=='ok'){
+            $('#adduserModal').modal('hide')
+            swal("恭喜你!", "注册成功!", "success")
+            $('#addform')[0].reset()
+            getlist()
+        }else{
+            swal("抱歉,注册失败！", "用户名或密码不能为空或者包含空格", "error")
+            $('#addform')[0].reset()
+            getlist()
+ }
+})
+    return false
+})
+  $('#adduserModal').find('.btn-default').on('click',function(){
+     $('#addform')[0].reset()
+})
+function getlist(){
+var re = ''
+$.getJSON('/gettable',function(rest){
+    $.each(rest,function(index,value){
+   
+    re +='<tr><td>'+value[0]+'</td>'
+    re +='<td>'+value[1]+'</td>'
+    re +='<td>'+value[2]+'</td>'
+    re +='<td><button data-id="'+value[0]+'" class="btn btn-danger btn-xs delete-btn">删除</button>'
+    re +='&nbsp<button  data-pwd="'+value[2]+'" data-id="'+value[0]+'" class="btn btn-info btn-xs update-btn">更新</button></td></tr>'
+     })
+    $('#tbody-content').html(re)
+})
+}
+getlist()
+
+$(document).on('click','.delete-btn',function(){
+    var id = $(this).attr('data-id')
+swal({
+  title: "确定删除?",
+  text: "删除用户会导致该用户无法登录使用!",
+  type: "warning",
+  showCancelButton: true,
+  cancelButtonText:"取消删除",
+  confirmButtonColor: "#DD6B55",
+  confirmButtonText: "甭考虑，删!",
+  closeOnConfirm: false,
+  html: false
+}, function(){
+   $.get('/deluser?id='+id,function(res){
+      if (res=='ok'){
+          swal("删除成功!","用户已删除!","success");
+          getlist()
+               }
+})
+});
+})
+$(document).on('click','.update-btn',function(){
+  var pwd = $(this).data('pwd')
+  var userid = $(this).data('id')
+  $('#updateuserModal').attr('data-userid',userid).modal('show')
+  $('#updateform').find('[name="pwd"]').val(pwd)
+})
+
+$('#updateuserModal').find('#updateform').on('submit',function(){
+  var userid = $('#updateuserModal').attr('data-userid')
+  var pwd = $('#updateform').find('[name="pwd"]').val()
+  $.post('/updateuser',{id:userid,pwd:pwd},function(res){
+     if (res=='ok'){
+            $('#updateuserModal').modal('hide')
+            swal("恭喜你!", "更新成功!", "success")
+            getlist()
+        }else{
+            swal("抱歉,更新失败！", "请重试", "error")
+ }
+})
+return false
+})
+//$('.usernav').ready(function(){
+//  $('.usernav').addClass('active')
+//})
+//$('.nav1').find('.usernav').addClass('active')
+
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <link rel="icon" href="/static/images/favicon.ico">
+
+    <title>小微财行的CMDB</title>
+    <link href="/static/bootstrap/bootstrap.css" rel="stylesheet">
+    <link href="/static/animate/animate.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/sweetalert/sweetalert.css">
+    <link rel="stylesheet" href="/static/jquery-ui/jquery-ui.min.css">
+    <link href="/static/datatable/jquery.dataTables.min.css" rel="stylesheet">
+{% block css%}
+
+{% endblock %}
+  <!--   <link href="dashboard.css" rel="stylesheet"> -->
+<style>
+/*
+ * Base structure
+ */
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 50px;
+}
+
+
+/*
+ * Global add-ons
+ */
+
+.sub-header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+/*
+ * Top navigation
+ * Hide default border to remove 1px line.
+ */
+.navbar-fixed-top {
+  border: 0;
+}
+
+/*
+ * Sidebar
+ */
+
+/* Hide for mobile, show later */
+.sidebar {
+  display: none;
+}
+@media (min-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 51px;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+    background-color: #f5f5f5;
+    border-right: 1px solid #eee;
+  }
+}
+
+/* Sidebar navigation */
+.nav-sidebar {
+  margin-right: -21px; /* 20px padding + 1px border */
+  margin-bottom: 20px;
+  margin-left: -20px;
+}
+.nav-sidebar > li > a {
+  padding-right: 20px;
+  padding-left: 20px;
+}
+.nav-sidebar > .active > a,
+.nav-sidebar > .active > a:hover,
+.nav-sidebar > .active > a:focus {
+  color: #fff;
+  background-color: #428bca;
+}
+
+
+/*
+ * Main content
+ */
+
+.main {
+  padding: 20px;
+}
+@media (min-width: 768px) {
+  .main {
+    padding-right: 40px;
+    padding-left: 40px;
+  }
+}
+.main .page-header {
+  margin-top: 0;
+}
+
+
+/*
+ * Placeholder dashboard ideas
+ */
+
+.placeholders {
+  margin-bottom: 30px;
+  text-align: center;
+}
+.placeholders h4 {
+  margin-bottom: 0;
+}
+.placeholder {
+  margin-bottom: 20px;
+}
+.placeholder img {
+  display: inline-block;
+  border-radius: 50%;
+}
+</style>
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="animated infinite bounce navbar-brand" href="http://www.xiaoweicaihang.com">小微财行CMBD</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+       <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">联系我<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="/lianxifs">懒人往下看，勤人点我</a></li>
+                <li><a href="#">懒到家了~~</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">QQ：1665439369</a></li>
+                <li><a href="#">手机：15768216871</a></li>
+              </ul>
+       </li>
+            <li><a>嗨，{{username}}</a></li>
+            <li><a href="/logout">退出登录</a></li>
+          </ul>
+   <!--       <form class="navbar-form navbar-right">
+            <input type="text" class="form-control" placeholder="Search...">
+          </form>     --!>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+           <ul class="nav nav-sidebar">
+             {% if session['user']=='admin' %}
+            <li><a href="/">用户管理</a></li>
+             {% endif %}
+            <li><a href="/zichan">资产管理</a></li>
+            <li><a href="/log">日志表格化</a></li>
+            <li><a href="/ksh">日志可视化</a></li>
+            <li><a href="/dl">用户地理分布</a></li>
+            <li><a href="/meminfo">内存监控</a></li>
+          </ul>
+        </div>
+
+        <div class="animated lightSpeedIn col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h2 class="sub-header">
+            {% block title %}
+
+            {% endblock %}
+          </h2>
+          <div class="table-responsive">
+            {% block body %}
+
+            {% endblock %}
+          </div>
+        </div>
+      </div>
+    </div>
+            {% block mdbody %}
+            {% endblock %}          
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/jquery/jquery.js"></script>
+    <script src="/static/jquery-ui/jquery-ui.min.js"></script>
+    <script src="/static/bootstrap/bootstrap.min.js"></script>
+    <script src="/static/sweetalert/sweetalert.min.js"></script>
+    <script src="/static/datatable/jquery.dataTables.min.js"></script>
+    <script>
+         //左侧栏高亮
+//       var path = location.pathname.replace('/','').replace('/','')
+//        // console.log(path)
+//       $('.nav-sidebar li').each(function(index,val){
+//         var url = $(val).find('a').attr('href').replace('/','')
+//           if (url==path) {
+//             $(val).addClass('active')
+//           };
+//         })
+//         // console.log(path)
+         var pathname = location.pathname
+         $.each($('.sidebar').find('a'),function(i,v){
+            if($(v).attr('href')==pathname){
+               $(v).parent().addClass('active')
+            }
+         })
+
+    //datatable汉化：
+    var oLanguage = {
+    "oAria": {
+        "sSortAscending": ": 升序排列",
+        "sSortDescending": ": 降序排列"
+    },
+    "oPaginate": {
+        "sFirst": "首页",
+        "sLast": "末页",
+        "sNext": "下页",
+        "sPrevious": "上页"
+    },
+    "sEmptyTable": "没有相关记录",
+    "sInfo": "第 _START_ 到 _END_ 条记录，共 _TOTAL_ 条",
+    "sInfoEmpty": "第 0 到 0 条记录，共 0 条",
+    "sInfoFiltered": "(从 _MAX_ 条记录中检索)",
+    "sInfoPostFix": "",
+    "sDecimal": "",
+    "sThousands": ",",
+    "sLengthMenu": "每页显示条数: _MENU_",
+    "sLoadingRecords": "正在载入...",
+    "sProcessing": "正在载入...",
+    "sSearch": "搜索:",
+    "sSearchPlaceholder": "",
+    "sUrl": "",
+    "sZeroRecords": "没有相关记录"
+}
+$.fn.dataTable.defaults.oLanguage = oLanguage;
+    </script>
+     {% block js %}  
+
+     {% endblock %}
+</body>
+</html>

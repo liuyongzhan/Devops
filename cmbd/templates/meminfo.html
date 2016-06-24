@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+{% block title %}
+内存监控
+{% endblock %}
+
+{% block body %}
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="mem" style="width: 900px;height:500px;"></div>
+
+{% endblock %}
+
+{% block js %}
+<script src='/static/echarts/echarts.min.js'></script>
+<script>
+$.getJSON('/memdata',function(res){
+    var myChart = echarts.init($('#mem')[0]);
+var option = {
+    title: {
+        text: '服务器内存使用率',
+        subtext: '项目演练'
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    legend: {
+        data:['内存使用率']
+    },
+    toolbox: {
+        show: true,
+        feature: {
+            dataZoom: {},
+            dataView: {readOnly: false},
+            magicType: {type: ['line', 'bar']},
+            restore: {},
+            saveAsImage: {}
+        }
+    },
+    xAxis:  {
+        type: 'time',
+        boundaryGap: false,
+    },
+    yAxis: {
+        type: 'value',
+        axisLabel: {
+            formatter: '{value} %'
+        }
+    },
+    series: [
+        {
+            name:'内存使用率',
+            type:'line',
+            showSymbol:false,
+            data:res.data,
+            },
+    ]
+};
+myChart.setOption(option);
+setInterval(function(){
+$.getJSON('/memdata',function(res){
+  myChart.setOption({
+    series:[{
+        data:res.data
+            }]
+  })
+})
+},5000)   //每5秒获取一次数据
+})
+</script>
+{% endblock %}
+

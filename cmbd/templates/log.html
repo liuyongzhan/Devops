@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Web状态统计
+{% endblock %}
+
+{% block body %}
+<table class="display" cellspacing="0" width="100%" id='table-data'>
+<thead>
+<tr>
+    <td>序号</td>
+    <td>IP</td>
+    <td>web状态码</td>
+    <td>PV</td>
+</tr>
+</thead>
+<tbody>
+{% for log in logs %}
+<tr>
+    <td>{{log[0]}}</td>
+    <td>{{log[1]}}</td>
+    <td>{{log[2]}}</td>
+    <td>{{log[3]}}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}
+
+{% block js %}
+<script>
+$(document).ready(function() {
+    $('#table-data').DataTable();
+});
+</script>
+{% endblock %}

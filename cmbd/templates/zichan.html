@@ -1,0 +1,257 @@
+{% extends 'layout.html'%}
+
+{% block title %}
+资产列表
+<button class='btn btn-info' data-toggle="modal" data-target="#addhostModal" id='openmodal'>
+添加主机
+</button>
+{% endblock %}
+{% block body %}
+<table class='table table-bordered table-hover' id='table-data'>
+<thead>
+   <tr>
+     <th>id</th>
+     <th>主机名</th>
+     <th>CPU</th>
+     <th>内存</th>
+     <th>过期时间</th>
+     <th>负责人</th>
+     <th>备注信息</th>
+     <th>动作</th>
+   </tr>
+</thead>
+
+<tbody id='tbody-content'>
+
+</tbody>
+
+</table>
+{% endblock %}
+
+{% block mdbody %}
+<div class="modal fade" id="addhostModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">添加主机</h4>
+      </div>
+      <div class="modal-body">
+         <form action='/addhost' id='addform'>
+          <div class="form-group">
+            <label for="recipient-name" class="control-label">主机名</label>
+            <input type="text" class="form-control" id="hostinput">
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">CPU</label>
+            <input type="text" class="form-control" id="cpuinput">
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">负责人</label>
+            <input type="text" class="form-control" id="authorinput">
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">备注信息</label>
+            <input type="text" class="form-control" id="noteinput">
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">内存</label>
+            <span class='slider-value'>2</span>G
+          <div class="slider"></div>
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">过期时间</label>
+            <p><input type="text" class="datepicker"></p>
+          </div>
+         </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary">确认</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="updatehostModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">更新主机信息</h4>
+      </div>
+      <div class="modal-body">
+         <form action='/updatehost' id='updateform'>
+          <div class="form-group">
+            <label for="recipient-name" class="control-label">主机名</label>
+            <input type="text" class="form-control" id="hostupdate">
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">CPU</label>
+            <input type="text" class="form-control" id="cpuupdate">
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">负责人</label>
+            <input type="text" class="form-control" id="authorupdate">
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">备注信息</label>
+            <input type="text" class="form-control" id="noteupdate">
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">内存</label>
+            <span class='slider-value'>2</span>G
+          <div class="slider slider2"></div>
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">过期时间</label>
+            <p><input type="text" class="datepicker datepicker2"></p>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <input type="submit" class="btn btn-primary" value='更新'>
+         </form>
+     </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+<script>
+
+function getlist(){
+var re = ''
+$.getJSON('/getzichan',function(rest){
+    $.each(rest,function(index,value){
+   
+    re +='<tr><td>'+value[0]+'</td>'
+    re +='<td>'+value[1]+'</td>'
+    re +='<td>'+value[2]+'</td>'
+    re +='<td>'+value[3]+'G'+'</td>'
+    re +='<td>'+value[4]+'</td>'
+    re +='<td>'+value[5]+'</td>'
+    re +='<td>'+value[6]+'</td>'
+    re +='<td><button data-id="'+value[0]+'" class="btn btn-danger btn-xs delete-btn">删除</button>'
+    re +='&nbsp<button data-id="'+value[0]+'" data-hostname="'+value[1]+'" data-cpu="'+value[2]+'" data-mem="'+value[3]+'" data-exdate="'+value[4]+'" data-author="'+value[5]+'" data-note="'+value[6]+'" class="btn btn-info btn-xs update-btn">更新</button></td></tr>'
+     })
+    var $table = $('#table-data')        
+
+    if($.fn.DataTable.isDataTable( '#table-data' )){
+    
+            $table.DataTable().destroy(); //Ç¿Õ»Ïtable
+    }
+
+
+    $('#tbody-content').html(re)
+    $table.DataTable({
+        responsive: true,
+        bLengthChange: true
+    });
+})
+}
+getlist()
+$(".slider").slider({
+          animate:"fast",
+          max:32,
+          min:2,
+          slide: function( event, ui ) {
+            var value = ui.value
+            $('.slider-value').html(value)
+          }
+});
+$(".datepicker").datepicker({
+  dateFormat: "yy-mm-dd"
+});
+$('#addhostModal').find('.btn-primary').on('click',function(){
+     var mem = ($('.slider').slider('value'))
+    // var exdate = $(".datepicker").datepicker("getDate");
+     var exdate = $(".datepicker").val()
+     var hostname = $('#hostinput').val()
+     var cpu = $('#cpuinput').val()
+     var author = $('#authorinput').val()
+     var note = $('#noteinput').val()
+    $.post('/addhost',{hostname:hostname,cpu:cpu,author:author,note:note,mem:mem,exdate:exdate},function(res){
+        if (res=='ok'){
+            $('#addhostModal').modal('hide')
+            swal("恭喜你!", "添加成功!", "success")
+            $('#addform')[0].reset()
+            getlist()
+        }else{
+            swal("抱歉,添加失败！", "添加信息不能为空或者包含空格", "error")
+            $('#addform')[0].reset()
+            getlist()
+ }
+ })
+    return false
+})
+  $('#addhostModal').find('.btn-default').on('click',function(){
+     $('#addform')[0].reset()
+})
+
+$(document).on('click','.delete-btn',function(){
+    var id = $(this).attr('data-id')
+swal({
+  title: "确定删除?",
+  text: "删除主机将丢失该主机的所有信息!",
+  type: "warning",
+  showCancelButton: true,
+  cancelButtonText:"取消删除",
+  confirmButtonColor: "#DD6B55",
+  confirmButtonText: "甭考虑，删!",
+  closeOnConfirm: false,
+  html: false
+}, function(){
+   $.get('/delhost?id='+id,function(res){
+      if (res=='ok'){
+          swal("删除成功!","主机已删除!","success");
+          getlist()
+               }
+})
+});
+})
+
+$(document).on('click','.update-btn',function(){
+  var hostid = $(this).data('id')
+  var hostname = $(this).data('hostname')
+  var cpu = $(this).data('cpu')
+  var mem = $(this).data('mem')
+  var exdate = $(this).data('exdate')
+  var author = $(this).data('author')
+  var note = $(this).data('note')
+  $('#updatehostModal').attr('data-hostid',hostid).modal('show')
+  $('#updateform').find('#hostupdate').val(hostname)
+  $('#updateform').find('#cpuupdate').val(cpu)
+  $('.slider2').slider('value',mem)
+  $('.slider-value').html(mem)
+  $('#updateform').find('.datepicker2').val(exdate)
+  $('#updateform').find('#authorupdate').val(author)
+  $('#updateform').find('#noteupdate').val(note)
+})
+
+$('#updatehostModal').find('#updateform').on('submit',function(){
+  var hostid = $('#updatehostModal').attr('data-hostid')
+  var hostname = $('#updateform').find('#hostupdate').val()
+  var cpu = $('#updateform').find('#cpuupdate').val()
+  var mem = ($('.slider2').slider('value'))
+  //var exdate = $(".datepicker2").datepicker("getDate");
+  var exdate = $(".datepicker2").val()
+  var author = $('#updateform').find('#authorupdate').val()
+  var note = $('#updateform').find('#noteupdate').val()
+  $.post('/updatehost',{id:hostid,hostname:hostname,cpu:cpu,mem:mem,exdate:exdate,author:author,note:note},function(res){
+     if (res=='ok'){
+            $('#updatehostModal').modal('hide')
+            swal("恭喜你!", "更新成功!", "success")
+            getlist()
+        }else{
+            swal("抱歉,更新失败！", "请重试", "error")
+ }
+})
+return false
+})
+
+</script>
+{% endblock %}
