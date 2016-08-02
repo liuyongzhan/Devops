@@ -10,8 +10,6 @@ sys.setdefaultencoding('utf-8')
 import config
 db = dbutil.DB(config.db,config.db_host,config.db_user,config.db_passwd)
 from functools import wraps
-import createtables
-createtables = createtables.createtables()
 import os
 #app.secret_key = os.urandom(32)
 app.secret_key = 'j32132sadfadsfash3inrsaui7yp32iwjkskl'
